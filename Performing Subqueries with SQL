@@ -1,0 +1,21 @@
+Use subquery to find out how many of the top 5 customers are based within each country
+
+SELECT  E.cpuntry, COUNT(DISTINCT B.customer_id) AS total_customer_count,
+COUNT (DISTINCT top_5_customers.customer_id) AS top_customer_count
+FROM country E
+  INNER JOIN city D ON E.country_id= D.country_id
+  INNER JOIN address C ON D.city_id= C.city_id
+  INNER JOIN customer B ON C.address_id= B.address_id
+  LEFT JOIN
+    (SELECT SUM (A.amount) AS total_amount_paid,
+      B.customer_id,
+      B.first_name,
+      B.last_name,
+      D.city,
+      E.country
+ FROM payment A
+  INNER JOIN customer B ON A.customer_id = B.customer_id
+  INNER JOIN address C ON B.address_id= C.address_id
+  INNER JOIN city D ON C.city_id = D.city_id
+  INNER JOIN country E ON D.country_id = E.country_id
+WHERE city IN 
