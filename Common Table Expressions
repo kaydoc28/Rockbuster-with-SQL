@@ -1,0 +1,37 @@
+Create a Common Table Expression (CTE) to see how many Top 5 customers are based in each country
+
+WITH top_5_customer_count_cte (total_amount_paid, customer_id, First_name, Last_name, city, country) AS
+(SELECT SUM (A.amount) AS total_amount_paid,
+B.customer_id, B.first_name, B.last_name, D.city, E.country
+FROM payment A
+  INNER JOIN customer B. ON A.customer_id=B.customer_id
+  INNER JOIN address C ON B.addres_id= C.address_id
+  INNER JOIN city D ON C.city_id= D.city_id
+  INNER JOIN country E ON D.country_id= E.country_id
+WHERE city IN ('Aurora', 'Atlixco', 'Xintai', 'Adoni', 'Dhule (Dhulia)', 'Kurashiki', 'Pingzing', 'Sivas', 'Celaya', 'So Leopoldo')
+GROUP BY B.customer_id, B.first_name, B.last_name, D.city, E.country
+ORDER BY total_amount_paid DESC
+LIMIT 5),
+
+all_customer_count_cte AS
+(SELECT E.country,
+COUNT(DISTINCT B. customer_id) AS all_customer_count,
+COUNT(DISTINCT E.country) AS top_5_customer_count
+FROM country E
+  INNER JOIN city D ON E.country_id= D.country_id
+  INNER JOIN address C ON D.city_id= C.city_id
+  INNER JOIN customer B ON C.address_id=B.address_id
+GROUP BY country)
+
+SELECT E.country
+COUNT(DISTINCT B. customer_id) AS all_customer_count,
+COUNT(DISTINCT top_5_customer_count_cte) AS top_5_customer_count
+FROM country E
+  INNER JOIN city D ON E.country_id= D.country_id
+  INNER JOIN address C ON D.city_id= C.city_id
+  INNER JOIN customer B ON C.address_id=B.address_id
+  LEFT JOIN 
+  top_5_customer_count_cte ON E.country = top_5_customer_count_cte.country
+GROUP BY E.country
+ORDER BY all_customer_count DESC
+LIMIT 5
